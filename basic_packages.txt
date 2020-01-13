@@ -1,0 +1,7 @@
+git
+glances
+gnome-tweaks
+google-chrome-stable
+sublime-text
+terminator
+vim

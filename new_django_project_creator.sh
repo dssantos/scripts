@@ -1,13 +1,17 @@
 #!/bin/bash
 #Starts a basic Django project
 
-PROJECTS_PATH="${HOME}/Desenvolvimento/django_projects" # Set a existing folder
-DIR_NAME="something"
-PROJECT_NAME="my_project"
+read -p "Type the projects path (Default: ${HOME}/Desenvolvimento/django_projects): " PROJECTS_PATH
+PROJECTS_PATH="${PROJECTS_PATH:=${HOME}/dev/django_projects}"
 
-cd $PROJECTS_PATH
-mkdir $DIR_NAME
-cd $DIR_NAME
+read -p "Type the project folder name (Default: something): " DIR_NAME
+DIR_NAME="${DIR_NAME:=something}"
+
+read -p "Type the project name (Default: my_project): " PROJECT_NAME
+PROJECT_NAME="${PROJECT_NAME:=my_project}"
+
+mkdir -p "$PROJECTS_PATH/$DIR_NAME"
+cd "$PROJECTS_PATH/$DIR_NAME"
 python -m venv ".${DIR_NAME}"
 source ".${DIR_NAME}/bin/activate"
 pip install --upgrade pip
@@ -23,5 +27,5 @@ sed -i "/^from\ django\.urls\ import\ path.*/a from\ ${PROJECT_NAME}\.core\ impo
 sed -i "/^urlpatterns.*/a \ \ \ \ path('', views.home)," "$VIRTUAL_ENV/../${PROJECT_NAME}/urls.py"
 sed -i "s/^.*Create.*/def\ home(request):\n\ \ \ \ return\ render(request,\ \'index.html\')/g" "$VIRTUAL_ENV/../${PROJECT_NAME}/core/views.py"
 mkdir core/templates
-echo "<html><h1>New Django Project</h1></html>" > core/templates/index.html
+echo "<html><p>New Project <b>$PROJECT_NAME</b> located at <b>$PROJECTS_PATH/$DIR_NAME</b>.</p></html>" > core/templates/index.html
 manage runserver

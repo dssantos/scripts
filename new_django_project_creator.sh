@@ -1,7 +1,7 @@
 #!/bin/bash
 #Starts a basic Django project
 
-read -p "Type the projects path (Default: ${HOME}/Desenvolvimento/django_projects): " PROJECTS_PATH
+read -p "Type the projects path (Default: ${HOME}/dev/django_projects): " PROJECTS_PATH
 PROJECTS_PATH="${PROJECTS_PATH:=${HOME}/dev/django_projects}"
 
 read -p "Type the project folder name (Default: something): " DIR_NAME

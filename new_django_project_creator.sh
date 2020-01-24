@@ -36,5 +36,6 @@ mkdir core/static
 cp -r $HTML_SOURCE/* $FULL_PATH/core/static/
 mv core/static/index.html core/templates/
 sed -i '1s/^/{% load static %}\n/' core/templates/index.html
+sed -E -i 's/(href|src)=("(img|js|css)[^"]*")/\1="{% static \2 %}"/g' core/templates/index.html
 
 manage runserver

@@ -2,9 +2,8 @@
 
 # Define variables
 PROJECTS_ROOT="${HOME}/dev/django_projects"
-PROJECT=mysite
-GIT_USER=username
-GIT_MAIL=user@mail.com
+PROJECT=sampleproject
+URL=$PROJECT'.dokku.local'
 
 # Open project folder
 mkdir -p ${PROJECTS_ROOT}/${PROJECT}
@@ -20,10 +19,14 @@ pip install django dj-database-url dj-static python-decouple
 django-admin startproject $PROJECT .
 alias manage='python $VIRTUAL_ENV/../manage.py'
 
-# Define variables
-echo 'DEBUG=False' > .env
+# Define environments variables
+echo 'DEBUG=True' > .env
 { echo -n SECRET_KEY= ; grep -oP "SECRET_KEY = '(.*)'" $PROJECT/settings.py | cut -d\' -f2 ; } | tr "" "" >> .env
-echo 'ALLOWED_HOSTS=127.0.0.1, .localhost, .herokuap.com, .dokku.local' >> .env
+echo 'ALLOWED_HOSTS=127.0.0.1, .localhost, .herokuap.com, .'$URL >> .env
+mkdir contrib
+echo 'DEBUG=True' > contrib/env-sample
+echo 'SECRET_KEY=CHANGE_THIS_SECRET_KEY' >> contrib/env-sample
+echo 'ALLOWED_HOSTS=127.0.0.1, .localhost, .herokuap.com, .'$URL >> contrib/env-sample 
 
 # Edit settings.py
 sed -i "s/^import os$/import os\nfrom decouple import config, Csv\nfrom dj_database_url import parse as dburl/" ${PROJECT}/settings.py  # Insert imports
@@ -66,11 +69,6 @@ mkdir $VIRTUAL_ENV/../${PROJECT}/core/static
 #mv $VIRTUAL_ENV/../${PROJECT}/core/static/index.html $VIRTUAL_ENV/../${PROJECT}/core/templates/
 #sed -i '1s/^/{% load static %}\n/' $VIRTUAL_ENV/../${PROJECT}/core/templates/index.html
 
-# Create requirements file
-pip freeze > requirements.txt
-echo 'gunicorn' >> requirements.txt
-echo 'psycopg2' >> requirements.txt
-
 # Create Procfile
 echo 'web: gunicorn '$PROJECT'.wsgi --log-file -' > Procfile
 echo 'release: python manage.py migrate --noinput' >> Procfile
@@ -78,10 +76,36 @@ echo 'release: python manage.py migrate --noinput' >> Procfile
 # Define python version on deploy
 echo 'python-3.8.2' > runtime.txt
 
-# Criar requirements.txt
-pip freeze > requirements.txt
+# Create requirements-dev file
+pip freeze > requirements-dev.txt
+
+# Create requirements file (to deploy)
+echo '-r requirements-dev.txt' >> requirements.txt
 echo 'gunicorn' >> requirements.txt
 echo 'psycopg2' >> requirements.txt
+
+#####################################################################
+# After create a repo on Github:
+GITHUB_REPO=https://github.com/dssantos/sampleproject.git
+
+# Create a README.md 
+echo """## How to Dev
+
+1. Clone repo
+2. Create a virtualenv
+3. Active virtualenv
+4. Install dependences
+5. Copy and edit your .env file
+
+\`\`\`console
+git clone $GITHUB_REPO $PROJECT
+cd $PROJECT
+python -m venv .$PROJECT
+source .$PROJECT/bin/activate
+pip install -r requirements-dev.txt
+cp contrib/env-sample .env
+cat .env
+\`\`\`""" > README.md
 
 # Prepare to push
 git init
@@ -92,9 +116,11 @@ echo '*.pyc' >> .gitignore
 echo '__cache__' >> .gitignore
 echo 'staticfiles' >> .gitignore
 git add .
-git config --global user.email $GIT_USER
-git config --global user.name $GIT_MAIL
-git commit -m 'First commit'
+git commit -m 'first commit'
+
+git remote add origin $GITHUB_REPO
+git push -u origin master
+
 
 # Run application
 manage migrate

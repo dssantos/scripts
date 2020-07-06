@@ -12,7 +12,7 @@ cd ${PROJECTS_ROOT}/${PROJECT}
 # Environment
 python -m venv '.'$PROJECT
 source '.'$PROJECT'/bin/activate'
-pip install pip --upgrade
+pip install --upgrade pip
 pip install django dj-database-url dj-static python-decouple
 
 # Create project
@@ -27,6 +27,16 @@ mkdir contrib
 echo 'DEBUG=True' > contrib/env-sample
 echo 'SECRET_KEY=CHANGE_THIS_SECRET_KEY' >> contrib/env-sample
 echo 'ALLOWED_HOSTS=127.0.0.1, .localhost, .herokuap.com, .'$URL >> contrib/env-sample 
+
+# Secret Key generator
+echo -e """\
+#!/usr/bin/env python
+
+from django.utils.crypto import get_random_string
+
+chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+print(get_random_string(50, chars))
+"""> contrib/secret_gen.py
 
 # Edit settings.py
 sed -i "s/^import os$/import os\nfrom decouple import config, Csv\nfrom dj_database_url import parse as dburl/" ${PROJECT}/settings.py  # Insert imports
@@ -46,32 +56,35 @@ sed -i 's/^import os$/import os\nfrom dj_static import Cling/' ${PROJECT}/wsgi.p
 sed -i "/^application = /c\application = Cling(get_wsgi_application())" ${PROJECT}/wsgi.py
 
 # Create app
+APP_NAME=core
 cd $VIRTUAL_ENV/../${PROJECT}
-manage startapp core
+manage startapp ${APP_NAME}
 cd ..
 
 # Insert app to INSTALED_APPS
-sed -i "/^.*django.contrib.staticfiles.*/a \ \ \ \ \'${PROJECT}.core\'," "$VIRTUAL_ENV/../${PROJECT}/settings.py"
+sed -i "/^.*django.contrib.staticfiles.*/a \ \ \ \ \'${PROJECT}.${APP_NAME}\'," "$VIRTUAL_ENV/../${PROJECT}/settings.py"
 
 # Insert route to urls.py
-sed -i "/^from\ django\.urls\ import\ path.*/a from\ ${PROJECT}\.core\ import\ views" "$VIRTUAL_ENV/../${PROJECT}/urls.py"
+sed -i "/^from\ django\.urls\ import\ path.*/a from\ ${PROJECT}\.${APP_NAME}\ import\ views" "$VIRTUAL_ENV/../${PROJECT}/urls.py"
 sed -i "/^urlpatterns.*/a \ \ \ \ path('', views.home)," "$VIRTUAL_ENV/../${PROJECT}/urls.py"
 
 # Insert a view
-sed -i "s/^.*Create.*/def\ home(request):\n\ \ \ \ return\ render(request,\ \'index.html\')/g" "$VIRTUAL_ENV/../${PROJECT}/core/views.py"
+sed -i "s/^.*Create.*/def\ home(request):\n\ \ \ \ return\ render(request,\ \'index.html\')/g" "$VIRTUAL_ENV/../${PROJECT}/${APP_NAME}/views.py"
 
 # Create template
-mkdir -p $VIRTUAL_ENV/../${PROJECT}/core/templates
-echo "<html><p>Index of <b>$PROJECT</b></p></html>" > $VIRTUAL_ENV/../${PROJECT}/core/templates/index.html
+mkdir -p $VIRTUAL_ENV/../${PROJECT}/${APP_NAME}/templates
+echo "<html><p>Index of <b>$PROJECT</b></p></html>" > $VIRTUAL_ENV/../${PROJECT}/${APP_NAME}/templates/index.html
 
 # Create static files folder
-mkdir $VIRTUAL_ENV/../${PROJECT}/core/static
-#mv $VIRTUAL_ENV/../${PROJECT}/core/static/index.html $VIRTUAL_ENV/../${PROJECT}/core/templates/
-#sed -i '1s/^/{% load static %}\n/' $VIRTUAL_ENV/../${PROJECT}/core/templates/index.html
+mkdir $VIRTUAL_ENV/../${PROJECT}/${APP_NAME}/static
+#mv $VIRTUAL_ENV/../${PROJECT}/${APP_NAME}/static/index.html $VIRTUAL_ENV/../${PROJECT}/${APP_NAME}/templates/
+#sed -i '1s/^/{% load static %}\n/' $VIRTUAL_ENV/../${PROJECT}/${APP_NAME}/templates/index.html
 
 # Create Procfile
-echo 'web: gunicorn '$PROJECT'.wsgi --log-file -' > Procfile
-echo 'release: python manage.py migrate --noinput' >> Procfile
+echo -e  '''\
+web: gunicorn '$PROJECT'.wsgi --log-file -
+release: python manage.py makemigrations --noinput & python manage.py migrate --noinput
+''' >> Procfile
 
 # Define python version on deploy
 echo 'python-3.8.2' > runtime.txt
@@ -83,46 +96,3 @@ pip freeze > requirements-dev.txt
 echo '-r requirements-dev.txt' >> requirements.txt
 echo 'gunicorn' >> requirements.txt
 echo 'psycopg2' >> requirements.txt
-
-#####################################################################
-# After create a repo on Github:
-GITHUB_REPO=https://github.com/dssantos/sampleproject.git
-
-# Create a README.md 
-echo """## How to Dev
-
-1. Clone repo
-2. Create a virtualenv
-3. Active virtualenv
-4. Install dependences
-5. Copy and edit your .env file
-
-\`\`\`console
-git clone $GITHUB_REPO $PROJECT
-cd $PROJECT
-python -m venv .$PROJECT
-source .$PROJECT/bin/activate
-pip install -r requirements-dev.txt
-cp contrib/env-sample .env
-cat .env
-\`\`\`""" > README.md
-
-# Prepare to push
-git init
-echo '.'$PROJECT > .gitignore
-echo '*.sqlite3' >> .gitignore
-echo '.env' >> .gitignore
-echo '*.pyc' >> .gitignore
-echo '__cache__' >> .gitignore
-echo 'staticfiles' >> .gitignore
-git add .
-git commit -m 'first commit'
-
-git remote add origin $GITHUB_REPO
-git push -u origin master
-
-
-# Run application
-manage migrate
-manage collectstatic
-manage runserver 0.0.0.0:8000

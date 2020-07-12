@@ -22,7 +22,7 @@ alias manage='python $VIRTUAL_ENV/../manage.py'
 # Define environments variables
 echo 'DEBUG=True' > .env
 { echo -n SECRET_KEY= ; grep -oP "SECRET_KEY = '(.*)'" $PROJECT/settings.py | cut -d\' -f2 ; } | tr "" "" >> .env
-echo 'ALLOWED_HOSTS=127.0.0.1, .localhost, .herokuap.com, .'$URL >> .env
+echo 'ALLOWED_HOSTS=127.0.0.1, .localhost, .herokuap.com, .dokku.local' >> .env
 mkdir contrib
 echo 'DEBUG=True' > contrib/env-sample
 echo 'SECRET_KEY=CHANGE_THIS_SECRET_KEY' >> contrib/env-sample

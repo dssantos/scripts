@@ -39,7 +39,7 @@ print(get_random_string(50, chars))
 """> contrib/secret_gen.py
 
 # Edit settings.py
-sed -i "s/^import os$/import os\nfrom decouple import config, Csv\nfrom dj_database_url import parse as dburl/" ${PROJECT}/settings.py  # Insert imports
+sed -i "s/^from pathlib import Path$/import os\nfrom pathlib import Path\nfrom decouple import config, Csv\nfrom dj_database_url import parse as dburl/" ${PROJECT}/settings.py  # Insert imports
 sed -i "/^SECRET_KEY = /c\SECRET_KEY = config('SECRET_KEY')" ${PROJECT}/settings.py # Replace SECRET_KEY
 sed -i "/^DEBUG = /c\DEBUG = config('DEBUG', default=False, cast=bool)" ${PROJECT}/settings.py # Replace DEBUG
 sed -i "/^ALLOWED_HOSTS = /c\ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=[], cast=Csv())" ${PROJECT}/settings.py # Replace ALLOWED_HOSTS

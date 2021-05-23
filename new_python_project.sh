@@ -20,7 +20,7 @@ read -e -i "$GIT_REPO" -p "Enter your url project on Github: " input
 GIT_REPO="${input:-$GIT_REPO}"
 
 
-mkdir ${DEV_FOLDER}/${PROJECT_NAME}
+mkdir -p ${DEV_FOLDER}/${PROJECT_NAME}
 cd ${DEV_FOLDER}/${PROJECT_NAME}
 python -m venv .${PROJECT_NAME}
 source .${PROJECT_NAME}/bin/activate

@@ -7,15 +7,14 @@
 
 
 PROJECT_NAME=newproject
-DEV_FOLDER=${HOME}/dev/python
-GIT_REPO=https://github.com/dssantos/${PROJECT_NAME}
-
 read -e -i "$PROJECT_NAME" -p "Enter your project name: " input
 PROJECT_NAME="${input:-$PROJECT_NAME}"
 
+DEV_FOLDER=${HOME}/dev/python
 read -e -i "$DEV_FOLDER" -p "Enter your root devlopment folder path: " input
 DEV_FOLDER="${input:-$DEV_FOLDER}"
 
+GIT_REPO=https://github.com/dssantos/${PROJECT_NAME}
 read -e -i "$GIT_REPO" -p "Enter your url project on Github: " input
 GIT_REPO="${input:-$GIT_REPO}"
 

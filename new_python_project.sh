@@ -46,7 +46,7 @@ git clone ${GIT_REPO} ${PROJECT_NAME}
 cd ${PROJECT_NAME}
 python -m venv .${PROJECT_NAME}
 Set-ExecutionPolicy Unrestricted -Scope Process -force
-.\.${PROJECT_NAME}\Scripts\activate
+./.${PROJECT_NAME}/Scripts/activate
 python -m pip install -U pip
 pip install -r requirements.txt
 \`\`\`

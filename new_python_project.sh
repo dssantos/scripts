@@ -31,17 +31,17 @@ echo -e """
 ## How to dev
 
 ### Linux
-```bash
+\`\`\`bash
 git clone ${GIT_REPO} ${PROJECT_NAME}
 cd ${PROJECT_NAME}
 python -m venv .${PROJECT_NAME}
 source .${PROJECT_NAME}/bin/activate
 python -m pip install -U pip
 pip install -r requirements.txt
-```
+\`\`\`
 
 ### Windows (Powershell)
-```bash
+\`\`\`bash
 git clone ${GIT_REPO} ${PROJECT_NAME}
 cd ${PROJECT_NAME}
 python -m venv .${PROJECT_NAME}
@@ -49,7 +49,7 @@ Set-ExecutionPolicy Unrestricted -Scope Process -force
 .\.${PROJECT_NAME}\Scripts\activate
 python -m pip install -U pip
 pip install -r requirements.txt
-```
+\`\`\`
 
 ## How to deploy
 

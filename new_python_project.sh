@@ -1,9 +1,6 @@
 #!/bin/bash
-# Start a new Python project with a virtual enviroment
-
-## How to use
-# To run local stored localy: . new_python_project.sh
-# To run file from Github: bash <(curl -s https://raw.githubusercontent.com/dssantos/scripts/master/new_python_project.sh)
+# Starts a new Python project with a virtual enviroment
+# Running: bash <(curl -s https://raw.githubusercontent.com/dssantos/scripts/master/new_python_project.sh)
 
 
 PROJECT_NAME=newproject
@@ -40,7 +37,7 @@ python -m pip install -U pip
 pip install -r requirements.txt
 \`\`\`
 
-### Windows (Powershell)
+### Windows
 \`\`\`bash
 git clone ${GIT_REPO} ${PROJECT_NAME}
 cd ${PROJECT_NAME}
@@ -50,25 +47,20 @@ Set-ExecutionPolicy Unrestricted -Scope Process -force
 python -m pip install -U pip
 pip install -r requirements.txt
 \`\`\`
-
-## How to deploy
-
-## How to use
-
 """ > README.md
-
 
 echo -e """
 .${PROJECT_NAME}/
-.env
-*.sqlite3
 *.pyc
 __pycache__
-staticfiles
 .vscode
 """ > .gitignore
-
 
 echo -e """
 """ > requirements.txt
 
+echo -e """
+Have Fun:
+cd ${HOME}/dev/python/${PROJECT_NAME}
+source .${PROJECT_NAME}/bin/activate
+"""

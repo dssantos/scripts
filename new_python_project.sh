@@ -61,6 +61,6 @@ echo -e """
 
 echo -e """
 Have Fun:
-cd ${HOME}/dev/python/${PROJECT_NAME}
+cd ${DEV_FOLDER}/${PROJECT_NAME}
 source .${PROJECT_NAME}/bin/activate
 """

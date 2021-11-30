@@ -11,10 +11,9 @@ python_setup () {
     read -e -i "$DEV_FOLDER" -p "Enter your root devlopment folder path: " input
     DEV_FOLDER="${input:-$DEV_FOLDER}"
 
-    GIT_REPO=https://github.com/dssantos/${PROJECT_NAME}
+    GIT_REPO=https://github.com/dssantos/$(echo $PROJECT_NAME | sed -r 's/_/-/g')
     read -e -i "$GIT_REPO" -p "Enter your url project on Github: " input
     GIT_REPO="${input:-$GIT_REPO}"
-
 
     mkdir -p ${DEV_FOLDER}/${PROJECT_NAME}
     cd ${DEV_FOLDER}/${PROJECT_NAME}
